@@ -1,0 +1,49 @@
+{
+  "name": "Dropifier",
+  "version": "1.0.0",
+  "description": "Dropifier",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "repository": "-",
+  "keywords": [
+    "Electron",
+    "Dropbox"
+  ],
+  "author": "Dot",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^7.1.4",
+    "electron-builder": "^21.2.0",
+    "electron-notarize": "^0.2.1"
+  },
+  "build": {
+    "appId": "com.dot.dropifier",
+    "afterSign": "app/notarize.js",
+    "mac": {
+      "category": "menubar.app",
+      "icon": "app/resources/icon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "app/entitlements.mac.plist",
+      "entitlementsInherit": "app/entitlements.mac.plist"
+    },
+    "protocols": [
+      {
+        "name": "Dropifier",
+        "role": "Viewer",
+        "schemes": [
+          "Dropifier"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "electron-lets-move": "0.0.5",
+    "electron-store": "^5.1.0"
+  }
+}
