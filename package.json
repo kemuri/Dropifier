@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "electron-lets-move": "0.0.5",
     "electron-store": "^5.1.0"
   }
 }
