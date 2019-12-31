@@ -29,7 +29,8 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "app/entitlements.mac.plist",
-      "entitlementsInherit": "app/entitlements.mac.plist"
+      "entitlementsInherit": "app/entitlements.mac.plist",
+      "publish": ["github"]
     },
     "protocols": [
       {
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "electron-store": "^5.1.0"
+    "electron-store": "^5.1.0",
+    "update-electron-app": "^1.5.0"
   }
 }

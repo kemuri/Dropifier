@@ -3,117 +3,78 @@ require('dotenv').config();
 
 const { app, Menu, Tray, dialog, shell, clipboard, protocol, Notification } = require('electron')
 const path = require('path');
+const dropTray = require('./droptray');
 const Store = require('electron-store');
-const PROTOCOL_PREFIX = 'Dropifier'
+const fs = require('fs');
 
-const store = new Store();
 
-let tray = null;
+
+//Global variables
+PROTOCOL_PREFIX = 'Dropifier'
+dataStore = new Store();
+Dropifier = app;
 
 app.on('ready', () => {
-  app.dock.hide();
-  //store.clear(); //imitate freesh install
-  setup(); 
-});
+  // app.dock.hide();
+  dataStore.clear(); //imitate freesh install
 
-function setup() {
-
-  // Setup dropbox on first run, show info message
-  if (store.get('dropbox_path') == undefined) {
-    dialog.showMessageBoxSync(null,{
-      type: 'info',
-      buttons: ['Select Dropbox folder'],
-      defaultId: 1,
-      title: 'Dropify setup',
-      message: 'Take me to your Dropbox folder',
-      detail: 'Please select your Dropbox folder location in the next step.'
-    });
-
-    setDropboxFolder();
-  }
-
-  //Register Dropify protocol
+  //Register Dropifier protocol
   protocol.registerHttpProtocol(PROTOCOL_PREFIX, (req, cb) => {});
   app.setAsDefaultProtocolClient(PROTOCOL_PREFIX)
 
-  //Setup tray menu
-  tray = new Tray(path.join(__dirname, 'resources/icon-dropify-Template.png'));
+  //Detect dropbox path if not yet set ->  ~/.dropbox/info.json
+  if (dataStore.get('dropbox_path') == undefined) {
+    try {
+      let dropbox_info = JSON.parse(fs.readFileSync(process.env.HOME + '/.dropbox/info.json'));
+      let path = dropbox_info.business ? dropbox_info.business.root_path : dropbox_info.personal.root_path; // user personal if available
+      dataStore.set('dropbox_path', path );
 
-  const contextMenu = Menu.buildFromTemplate([
-    { click: setDropboxFolder, label: 'Set Dropbox folder'},
-    { type:'separator' },
-    { click: (menuItem) => { 
-        store.set('enclosing_only', menuItem.checked) 
-      }, 
-      label: 'Always open enclosing folder', type: 'checkbox', checked: store.get('enclosing_only'), enabled: true
-    },
-    { click: (menuItem) => { 
-        store.set('show_notifciations', menuItem.checked) 
-      }, 
-      label: 'Show notifications', type: 'checkbox', checked: store.get('show_notifciations'), enabled: true
-    }, 
-    { click: (menuItem) => { 
-        store.set('startup', menuItem.checked); 
-        app.setLoginItemSettings({openAtLogin: menuItem.checked }); //start on login
-      }, 
-      label: 'Launch on startup', type: 'checkbox', checked: store.get('startup'),enabled: true
-    }, 
-    { type:'separator' },
-    { click: () => { app.quit() },  label: 'Quit' }
-  ])
-
-  tray.setToolTip('Dropify')
-  tray.setContextMenu(contextMenu)
-  
-  
-  tray.on('drop-files', function(event, files) {
-    if (files[0].startsWith(store.get('dropbox_path'))) {
-      let file_path = files[0].substring(store.get('dropbox_path').length, files[0].length)
-      let url = PROTOCOL_PREFIX + ":/" + file_path;
-      clipboard.writeText(encodeURI(url));
-      
-      if (store.get('show_notifciations')) {
-        new Notification({ title: 'Link copied to clipboard', body: url, icon: path.join(__dirname, 'notification-ok.png')}).show();
-      } 
-    } else {
-      // if (store.get('show_notifciations')) {
-        new Notification({ title: 'Dropify failed!', body: 'The selected file is not in your Dropbox folder.', icon: path.join(__dirname, 'notification-error.png')}).show();
-      // }
+    } catch (error) { //show error message if auto discovery failed
+      console.log(error);
+      dialog.showMessageBoxSync(null,{
+        type: 'error',
+        buttons: ['OK'],
+        title: 'Dropifier',
+        message: 'Error occured while trying to find your Dropbox folder.',
+        detail: 'You can set it up later manuall by clicking the Dropifier icon in the menu bar.'
+      });
     }
-  });
+  }
 
-}
+  //Setup tray menu
+  dropTray.init('resources/icon-dropify-Template.png',app);
+
+});
 
 //Save the dropbox path
-function setDropboxFolder () {
-  let result = dialog.showOpenDialogSync({ properties: ['openDirectory',] })
-  if (result != undefined) { // we have a valid selection
-    store.set('dropbox_path', result[0]);
-  } else { //User pressed cancel, show error message
-    showMissingDropboxError();
-  }
-}
+// function setDropboxFolder () {
+//   let result = dialog.showOpenDialogSync({ properties: ['openDirectory',] })
+//   if (result != undefined) { // we have a valid selection
+//     store.set('dropbox_path', result[0]);
+//   } else { //User pressed cancel, show error message
+//     showMissingDropboxError();
+//   }
+// }
 
-function showMissingDropboxError() {
-  let res = dialog.showMessageBoxSync(null,{
-    type: 'warning',
-    buttons: ['OK','Select Dropbox folder'],
-    defaultId: 2,
-    title: 'Dropify setup',
-    message: "In order to Dropify to work, you'll need to select it's location.",
-    detail: 'You can do it anytime from the menubar app.'
-  });
+// function showMissingDropboxError() {
+//   let res = dialog.showMessageBoxSync(null,{
+//     type: 'warning',
+//     buttons: ['OK','Select Dropbox folder'],
+//     defaultId: 2,
+//     title: 'Dropify setup',
+//     message: "In order to Dropify to work, you'll need to select it's location.",
+//     detail: 'You can do it anytime from the menubar app.'
+//   });
 
-  if (res == 1) { 
-    setDropboxFolder();
-  }
-}
+//   if (res == 1) { 
+//     setDropboxFolder();
+//   }
+// }
 
 app.on('open-url', function (event, url) {
   event.preventDefault();
-  let real_url = decodeURI(store.get('dropbox_path') + url.substring(PROTOCOL_PREFIX.length+2));
-  
-  if (store.get('enclosing_only')) {
+  let real_url = decodeURI(dataStore.get('dropbox_path') + url.substring(PROTOCOL_PREFIX.length+2));
+  if (dataStore.get('enclosing_only')) {
     shell.showItemInFolder(real_url);
   } else {
     shell.openItem(real_url)  
