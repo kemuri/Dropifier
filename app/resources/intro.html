@@ -1,0 +1,57 @@
+<html>
+  <head>
+
+    <title>Frameless Window</title>
+
+    <link rel="stylesheet" href="https://use.typekit.net/dcd8amn.css">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="   crossorigin="anonymous"></script>
+    <script src="introWindow.js"></script>
+    <script>if (window.module) module = window.module;</script>
+  
+  </head>
+
+  <body>
+    
+    <section>
+      <a href="#" class="close"><img src="btn_close.svg" alt=""></a>
+      <img src="logo.svg" alt="" class="logo">
+      <img src="Dropifier-text.svg" alt="">
+      <p>Dropifier is a tiny macOS app, that opens your Dropbox links directly in Finder.</p>
+      <hr />
+      <ul class="stepper">
+        <li><img src="numero-1.svg" alt=""></li>
+        <li><img src="numero-2.svg" alt=""></li>
+        <li><img src="numero-3.svg" alt=""></li>
+      </ul>
+      <ul class="steps">
+        <li>
+          <h2>Drag a file</h2>
+          <img src="step_1.png" alt="">
+          <p>Simply drag and drop any file or folder from your Dropbox directory to the Dropifier icon in your menubar.</p>
+        </li>
+
+        <li>
+          <h2>Paste the link</h2>
+          <img src="step_2.png" alt="">
+          <p>Dropfier will create the link, and copy it to your clipboard automatically.</p>
+        </li>
+
+        <li>
+          <h2>Enjoy</h2>
+          <img src="step_3.png" alt="">
+          <p>Clicking on a Dropifier link will now open the given file or folder directly in Finder!</p>
+        </li>
+      </ul>
+      <hr>
+      <button class="btn_ok">OK, got it!</button>
+      <div class="settings">
+        <p>Dropified is configured to use the following root Dropbox directory. Change if neccesary.</p>
+        <span>📦 <a href="#" class="dbpath">~/Users/kemuri/Dot Dropbssssssox</a></span>
+      </div>
+    </section>
+  </body>
+
+</html>

@@ -1,0 +1,143 @@
+body {
+    background-color: white;
+    color: black;
+    font-family: neue-haas-grotesk-display, sans-serif;
+    padding: 0px; 
+    margin: 0px; 
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+section {
+    width: 300px;
+    padding: 30px;
+    height: 570px;
+
+    position: relative;
+}
+
+a.close {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+}
+
+img.logo {
+    width: 33px;
+    display: block;
+    margin-bottom: 10px;;
+}
+
+h1  {
+    font-family: sofia-pro, sans-serif;
+    font-size: 38pt;
+    color: #2D2D2D;
+    margin-top: 0px;;
+    margin-bottom: 5px;
+    letter-spacing: -1px;;
+}
+
+p {
+    font-size: 11pt;
+    font-family: neue-haas-grotesk-display, sans-serif;
+    color: #646464;
+}
+
+hr {
+    border-top: 1px solid #f3f3f3;
+    /* height: 2px; */
+    margin-bottom: 15px;
+}
+
+ul.stepper {
+    width: 100px;
+    right: 30px;
+    position: absolute;
+    text-align: right;
+    margin-top: 10px;
+}
+
+ul.stepper li {
+    display: inline-block;
+    margin: 0px;
+    padding: 0px;
+}
+
+ul.stepper img {
+    width:20px;
+}
+
+ul.steps {
+    width:300px;
+    height: 230px;
+    /* overflow: hidden; */
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: 15px;
+    
+    position: relative;
+    cursor: pointer;
+}
+
+ul.steps li {
+    display: inline-block;
+    padding: 0px;
+    margin: 0px;
+    width: 300px;
+    /* border: 1px solid red; */
+    position: absolute;
+}
+
+ul.steps h2 {
+    margin: 0px;
+}
+
+ul.steps img {
+    width: 100%;
+}
+
+button {
+    width: 100%;
+    border: none;
+    background-color: #0057FF;
+    font-family: sofia-pro, sans-serif;
+    font-size: 16pt;
+    color: white;;
+    border-radius: 4px;
+    padding: 7px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+button:hover {
+    background-color: black;
+}
+
+div.settings p {
+    font-size: 9pt;
+    color: #646466;
+    margin-bottom: 0px;
+}
+
+div.settings span, div.settings a {
+    color: black;
+    font-size: 9pt;
+}
+
+
+
+

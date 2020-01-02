@@ -6,9 +6,13 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "deploy": "electron-builder build --mac --publish always"
   },
-  "repository": "-",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/kemuri/Dropifier.git"
+  },
   "keywords": [
     "Electron",
     "Dropbox"
@@ -25,12 +29,15 @@
     "afterSign": "app/notarize.js",
     "mac": {
       "category": "menubar.app",
+      "target": ["dmg"],
       "icon": "app/resources/icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "app/entitlements.mac.plist",
       "entitlementsInherit": "app/entitlements.mac.plist",
-      "publish": ["github"]
+      "publish": {
+        "provider":"github"
+      }
     },
     "protocols": [
       {
@@ -45,6 +52,8 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "electron-store": "^5.1.0",
+    "electron-updater": "^4.2.0",
     "update-electron-app": "^1.5.0"
   }
 }
+

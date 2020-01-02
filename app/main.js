@@ -1,22 +1,41 @@
 // Module to create native browser window.
 require('dotenv').config();
 
-const { app, Menu, Tray, dialog, shell, clipboard, protocol, Notification } = require('electron')
+const { app, Menu, Tray, dialog, shell, clipboard, protocol, Notification, BrowserWindow, ipcMain } = require('electron')
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const dropTray = require('./droptray');
 const Store = require('electron-store');
 const fs = require('fs');
 
-
-
 //Global variables
 PROTOCOL_PREFIX = 'Dropifier'
 dataStore = new Store();
 Dropifier = app;
+introWindow = undefined;
+
+// ipcMain.on('synchronous-message', (event, arg) => {
+//   console.log(arg) // prints "ping"
+//   event.returnValue = 'pong'
+// })
 
 app.on('ready', () => {
-  // app.dock.hide();
-  dataStore.clear(); //imitate freesh install
+  app.dock.hide();
+  // dataStore.clear(); //imitate fresh install
+
+  if (dataStore.size == 0) { //this is the first start, show intro window
+    introWindow = new BrowserWindow({width: 360, height: 600, frame: false, webPreferences: { nodeIntegration: true }});
+    introWindow.loadURL('file://' + __dirname + '/resources/intro.html');
+
+    // introWindow.webContents.on('did-finish-load', function() {
+    //   introWindow.webContents.send('ping', 'whoooooooh!');
+    // });
+
+    // introWindow.webContents.openDevTools();
+
+    // Emitted when the window is closed.
+    introWindow.on('closed', function() { introWindow = null; });
+  }
 
   //Register Dropifier protocol
   protocol.registerHttpProtocol(PROTOCOL_PREFIX, (req, cb) => {});
@@ -26,7 +45,9 @@ app.on('ready', () => {
   if (dataStore.get('dropbox_path') == undefined) {
     try {
       let dropbox_info = JSON.parse(fs.readFileSync(process.env.HOME + '/.dropbox/info.json'));
-      let path = dropbox_info.business ? dropbox_info.business.root_path : dropbox_info.personal.root_path; // user personal if available
+      let path = dropbox_info.business ? dropbox_info.business.root_path : dropbox_info.personal.root_path; // user business dropbox account if available
+      
+      global.sharedObj = {db_path: path};
       dataStore.set('dropbox_path', path );
 
     } catch (error) { //show error message if auto discovery failed
@@ -36,40 +57,38 @@ app.on('ready', () => {
         buttons: ['OK'],
         title: 'Dropifier',
         message: 'Error occured while trying to find your Dropbox folder.',
-        detail: 'You can set it up later manuall by clicking the Dropifier icon in the menu bar.'
+        detail: 'You can set it up later manually by clicking the Dropifier icon in the menu bar.'
       });
     }
   }
 
   //Setup tray menu
   dropTray.init('resources/icon-dropify-Template.png',app);
-
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
-//Save the dropbox path
-// function setDropboxFolder () {
-//   let result = dialog.showOpenDialogSync({ properties: ['openDirectory',] })
-//   if (result != undefined) { // we have a valid selection
-//     store.set('dropbox_path', result[0]);
-//   } else { //User pressed cancel, show error message
-//     showMissingDropboxError();
-//   }
-// }
+ipcMain.on('close_window', (event, arg) => {
+  introWindow.hide();
+})
 
-// function showMissingDropboxError() {
-//   let res = dialog.showMessageBoxSync(null,{
-//     type: 'warning',
-//     buttons: ['OK','Select Dropbox folder'],
-//     defaultId: 2,
-//     title: 'Dropify setup',
-//     message: "In order to Dropify to work, you'll need to select it's location.",
-//     detail: 'You can do it anytime from the menubar app.'
-//   });
+ipcMain.on('select_path', (event, arg) => {
+  let dbpath = dropTray.onDropboxSetup();
+  event.returnValue = dbpath;
+})
 
-//   if (res == 1) { 
-//     setDropboxFolder();
-//   }
-// }
+autoUpdater.on('update-available', () => {
+  // Notify user
+  // new Notification({ title: 'New version available!', body: 'A new version of the app is downloading.', silent:true }).show();
+});
+
+autoUpdater.on('update-downloaded', () => {
+  let restartNotification  = new Notification({ title: 'New version is available', body: 'Click here to install and restart Dropifier.', silent:true })
+  
+  restartNotification.show();
+  restartNotification.on('click', (event) => {
+    autoUpdater.quitAndInstall();
+  })
+});
 
 app.on('open-url', function (event, url) {
   event.preventDefault();
@@ -85,6 +104,3 @@ app.on('open-url', function (event, url) {
 app.on('activate', function () {
 
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
