@@ -64,6 +64,7 @@ app.on('ready', () => {
 
   //Setup tray menu
   dropTray.init('resources/icon-dropify-Template.png',app);
+  // autoUpdater.checkForUpdates(); //Dev testing
   autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -76,19 +77,18 @@ ipcMain.on('select_path', (event, arg) => {
   event.returnValue = dbpath;
 })
 
-autoUpdater.on('update-available', () => {
-  // Notify user
-  // new Notification({ title: 'New version available!', body: 'A new version of the app is downloading.', silent:true }).show();
-});
+// autoUpdater.on('update-available', () => {
+//   // Notify user
+//   new Notification({ title: 'New version available!', body: 'A new version of the app is downloading.', silent:true }).show();
+// });
 
-autoUpdater.on('update-downloaded', () => {
-  let restartNotification  = new Notification({ title: 'New version is available', body: 'Click here to install and restart Dropifier.', silent:true })
-  
-  restartNotification.show();
-  restartNotification.on('click', (event) => {
-    autoUpdater.quitAndInstall();
-  })
-});
+// autoUpdater.on('update-downloaded', () => {
+//   let restartNotification  = new Notification({ title: 'New version is available', body: 'Click here to install and restart Dropifier.', silent:true })
+//   restartNotification.show();
+//   restartNotification.on('click', (event) => {
+//     autoUpdater.quitAndInstall();
+//   })
+// });
 
 app.on('open-url', function (event, url) {
   event.preventDefault();
