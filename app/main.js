@@ -22,8 +22,7 @@ app.on('ready', () => {
   dataStore.clear(); //imitate fresh install
 
   if (dataStore.size == 0) { //this is the first start, show intro window
-    introWindow = new BrowserWindow({width: 360, height: 600, frame: false, webPreferences: { nodeIntegration: true }});
-    introWindow.hide();
+    introWindow = new BrowserWindow({show: false, width: 360, height: 600, frame: false, webPreferences: { nodeIntegration: true }});
     introWindow.loadURL('file://' + __dirname + '/resources/intro.html');
     introWindow.once('ready-to-show', () => { introWindow.show() })
     introWindow.on('closed', function() { introWindow = null; });
