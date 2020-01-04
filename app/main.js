@@ -14,26 +14,18 @@ dataStore = new Store();
 Dropifier = app;
 introWindow = undefined;
 
-// ipcMain.on('synchronous-message', (event, arg) => {
-//   console.log(arg) // prints "ping"
-//   event.returnValue = 'pong'
-// })
+if (!app.requestSingleInstanceLock()) { app.quit(); } //Kill yo self if you are not the first app
 
 app.on('ready', () => {
   app.dock.hide();
-  // dataStore.clear(); //imitate fresh install
+
+  dataStore.clear(); //imitate fresh install
 
   if (dataStore.size == 0) { //this is the first start, show intro window
     introWindow = new BrowserWindow({width: 360, height: 600, frame: false, webPreferences: { nodeIntegration: true }});
+    introWindow.hide();
     introWindow.loadURL('file://' + __dirname + '/resources/intro.html');
-
-    // introWindow.webContents.on('did-finish-load', function() {
-    //   introWindow.webContents.send('ping', 'whoooooooh!');
-    // });
-
-    // introWindow.webContents.openDevTools();
-
-    // Emitted when the window is closed.
+    introWindow.once('ready-to-show', () => { introWindow.show() })
     introWindow.on('closed', function() { introWindow = null; });
   }
 
@@ -75,21 +67,9 @@ ipcMain.on('close_window', (event, arg) => {
 ipcMain.on('select_path', (event, arg) => {
   let dbpath = dropTray.onDropboxSetup();
   event.returnValue = dbpath;
-})
+});
 
-// autoUpdater.on('update-available', () => {
-//   // Notify user
-//   new Notification({ title: 'New version available!', body: 'A new version of the app is downloading.', silent:true }).show();
-// });
-
-// autoUpdater.on('update-downloaded', () => {
-//   let restartNotification  = new Notification({ title: 'New version is available', body: 'Click here to install and restart Dropifier.', silent:true })
-//   restartNotification.show();
-//   restartNotification.on('click', (event) => {
-//     autoUpdater.quitAndInstall();
-//   })
-// });
-
+//Intercept Dropify links and open finder (nain app functionality 🤣)
 app.on('open-url', function (event, url) {
   event.preventDefault();
   let real_url = decodeURI(dataStore.get('dropbox_path') + url.substring(PROTOCOL_PREFIX.length+2));
