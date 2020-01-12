@@ -19,7 +19,7 @@ if (!app.requestSingleInstanceLock()) { app.quit(); } //Kill yo self if you are 
 app.on('ready', () => {
   app.dock.hide();
 
-  dataStore.clear(); //imitate fresh install
+  // dataStore.clear(); //imitate fresh install
 
   if (dataStore.size == 0) { //this is the first start, show intro window
     introWindow = new BrowserWindow({show: false, width: 360, height: 600, frame: false, webPreferences: { nodeIntegration: true }});
