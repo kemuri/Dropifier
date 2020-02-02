@@ -52,7 +52,7 @@ https://www.electron.build/code-signing
 Version History
 =======
 
-### 1.0.1 - Reverse Drop
+### 1.0.3 - Reverse Drop
 Now you can a drop a Dropbox url, and the app will try to find the given file in your Dropbox folder. Currently only works for files, not for folders.
 
 ### 1.0 - Barely usable
