@@ -1,5 +1,7 @@
-const { Menu, Tray, clipboard, dialog, Notification } = require('electron')
+const { Menu, Tray, clipboard, dialog, Notification, shell } = require('electron')
 const path = require('path');
+const fs = require('fs');
+const { exec, execSync } = require("child_process");
 
 class DropTray{
 
@@ -26,7 +28,9 @@ class DropTray{
       this._tray.setContextMenu(Menu.buildFromTemplate(DropTray._defaultmenu));
       this._tray.setPressedImage(path.join(__dirname, 'resources/icon-dropify-pressed-Template.png'));
       this._tray.on('drop-files', this.onFileDrop);
-
+      this._tray.on('drop-text', this.onTextDrop);
+      
+      // this.onTextDrop(null, 'https://www.dropbox.com/s/t1ichayx54a39hb/csillamponifinal2.mp4?dl=0')
    }
 
    static onFolderClick(menuItem) {
@@ -74,6 +78,50 @@ class DropTray{
       }
    }
 
+   static onTextDrop(event, text) {
+
+      if (text.startsWith('https://www.dropbox.com/s/')) { //we've got a dropbox link
+         DropTray.playDropAnimation();
+         
+         var filename = text.slice(text.lastIndexOf('/')+1, text.lastIndexOf('?'));
+         var dirname = dataStore.get('dropbox_path').replace(/(\s+)/g, '\\$1');
+
+         console.log(dirname)
+         console.log(filename)
+         console.log('mdfind '+filename)
+
+         //Mdfind works only with macOS
+         exec('mdfind '+filename +' -onlyin '+dirname, (error, stdout, stderr) => {
+            if (error || stderr) {
+               new Notification({ title: 'Error finding file', body: 'Uh. We encountered an error while trying to find your file.', silent:false, icon: path.join(__dirname, 'notification-error.png')}).show();
+               return;
+            }
+      
+            var resArray = stdout.toString().split('\n');
+            if (resArray != null) {
+               if (dataStore.get('enclosing_only')) {
+                 shell.showItemInFolder(resArray[0]);
+               } else {
+                 shell.openItem(resArray[0]);  
+               }
+               if (resArray.length > 1) {
+                  new Notification({ title: 'Multiple copies found', body: `We are showing you the first result for ${filename}.`, silent:true, }).show();
+               }
+               
+
+            } else {
+               new Notification({ title: 'File not found', body: `Uh. We couldn't find your file in ${dirname}.`, silent:false, icon: path.join(__dirname, 'notification-error.png')}).show();
+               // new Notification({ title: 'Link copied to your clipboard', body: url, silent:true, icon: path.join(__dirname, 'notification-ok.png')}).show();
+            }        
+        });
+
+      } else if (text.startsWith('http')) { // let's open this url 
+         shell.openExternal(text);
+      }
+
+      //https://www.dropbox.com/s/t1ichayx54a39hb/csillamponifinal2.mp4?dl=0
+   }
+
    static playDropAnimation() {
 
       var count = 0;
@@ -85,6 +133,26 @@ class DropTray{
       
       setInterval(animator, 60);
    }
+
+   // static _find(base,name,files,result) { //recursive file finder 
+   //    files = files || fs.readdirSync(base) 
+   //    result = result || [] 
+      
+   //    files.forEach( 
+   //      function (file) {
+   //          var newbase = path.join(base,file)
+   //          if ( fs.statSync(newbase).isDirectory() ){
+   //              result = DropTray._find(newbase,name,fs.readdirSync(newbase),result)
+   //          } else {
+   //             console.log(file);
+   //             if (file == name) {
+   //                result.push(newbase)
+   //             }
+   //          }
+   //      }
+   //    )
+   //    return result;
+   // }
 
    static _updateHistory(url,raw_url) {
 

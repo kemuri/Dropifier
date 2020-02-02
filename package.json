@@ -1,6 +1,6 @@
 {
   "name": "Dropifier",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Dropifier",
   "main": "app/main.js",
   "scripts": {

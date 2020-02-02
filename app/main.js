@@ -3,10 +3,10 @@ require('dotenv').config();
 
 const { app, Menu, Tray, dialog, shell, clipboard, protocol, Notification, BrowserWindow, ipcMain } = require('electron')
 const { autoUpdater } = require('electron-updater');
-const path = require('path');
 const dropTray = require('./droptray');
 const Store = require('electron-store');
 const fs = require('fs');
+
 
 //Global variables
 PROTOCOL_PREFIX = 'Dropifier'

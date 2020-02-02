@@ -21,6 +21,7 @@ Clicking on a Dropifier link will now open the given file or folder directly in 
 * Animated menubar icon
 * History
 * Autodetect Dropbox location
+* Locate file in Dropbox share URL
 
 ## Supported platforms
 *  MacOS
@@ -50,8 +51,9 @@ https://www.electron.build/code-signing
 
 Version History
 =======
-### 1.1 - Usable
-Added drop animations, history, automatic updates and Dropbox folder detection.
+
+### 1.0.1 - Reverse Drop
+Now you can a drop a Dropbox url, and the app will try to find the given file in your Dropbox folder. Currently only works for files, not for folders.
 
 ### 1.0 - Barely usable
 Working application with the barebones functionality.
